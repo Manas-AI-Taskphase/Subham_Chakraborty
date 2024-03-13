@@ -1,4 +1,29 @@
-#include "ros/ros.h"
+#include <ros/ros.h>
+#include <std_msgs/String.h>
+
+void Callback(const std_msgs::String::ConstPtr &msg) {
+    std::cout << msg->data<<std::endl;
+}
+int main(int argc, char **argv) {
+    ros::init(argc, argv, "listener");
+    ros::NodeHandle n;
+    ros::AsyncSpinner spinner(1);
+    spinner.start();
+    ros::Publisher chat_pub = n.advertise<std_msgs::String>("t2", 1000);
+    ros::Subscriber chat_sub = n.subscribe("t1", 1000, Callback);
+    
+    while (ros::ok()) {
+        std_msgs::String msg;
+        std::getline(std::cin, msg.data);
+        if (msg.data == "/exit"){
+           break;
+        }
+        chat_pub.publish(msg);
+    }
+    spinner.stop();
+    return 0;
+}
+/*#include "ros/ros.h"
 #include "std_msgs/String.h"
 #include <termios.h>
 #include <unistd.h>
@@ -64,7 +89,8 @@ int main(int argc, char**argv){
        ros::spinOnce();
        loop_rate.sleep();
     }
-}
+}*/
+
 /*#include "ros/ros.h"
 #include "std_msgs/String.h"
 #include <opencv2/core.hpp>
